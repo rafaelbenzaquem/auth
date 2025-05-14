@@ -9,10 +9,11 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 
 import java.util.List;
 
-@Configuration
+//@Slf4j
+//@Configuration
 public class JwtCustomizerConfig {
 
-    @Bean
+//    @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
         return context -> {
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
@@ -22,6 +23,7 @@ public class JwtCustomizerConfig {
                         .toList();
                 context.getClaims().claim("roles", roles);
             }
+//            log.info("JwtCustomizerConfig context: {}", context);
         };
     }
 }

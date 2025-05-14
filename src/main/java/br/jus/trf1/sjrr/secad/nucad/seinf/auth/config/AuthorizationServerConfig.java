@@ -9,22 +9,32 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
+//@Configuration
 public class AuthorizationServerConfig {
 
-    @Bean
-    @Order(1)
+//    @Bean
+//    @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+        // Configure the endpoints for the OAuth2 Authorization Server
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+                new OAuth2AuthorizationServerConfigurer();
+        var endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
         http
-                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-                .with(authorizationServerConfigurer, Customizer.withDefaults())
-                .authorizeHttpRequests(authz -> authz.anyRequest().authenticated());
-
+                // Apply security only to the OAuth2 authorization endpoints
+                .securityMatcher(endpointsMatcher)
+                // Disable CSRF protection for the OAuth2 endpoints
+                .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
+                // All requests to these endpoints require an authenticated user
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                // Provide a login form for end-user authentication
+                .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                // Apply the OAuth2 Authorization Server configuration (use with() since apply() is deprecated)
+                .with(authorizationServerConfigurer, Customizer.withDefaults());
         return http.build();
     }
 
-    @Bean
+//    @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
                 .issuer("http://localhost:9000")

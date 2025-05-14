@@ -1,10 +1,12 @@
 package br.jus.trf1.sjrr.secad.nucad.seinf.auth.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
@@ -12,14 +14,19 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig {
+
+    @Value("${domain.control.name}")
+    private String nomeDominio;
+
+    @Value("${domain.control.url}")
+    private String urlDominio;
 
     @Bean
     public ActiveDirectoryLdapAuthenticationProvider adAuthenticationProvider() {
         ActiveDirectoryLdapAuthenticationProvider provider =
-                new ActiveDirectoryLdapAuthenticationProvider(
-                        "benzaquem.com.br",
-                        "ldap://192.168.153.132:389/");
+                new ActiveDirectoryLdapAuthenticationProvider(nomeDominio, urlDominio);
         provider.setConvertSubErrorCodesToExceptions(true);
         provider.setUseAuthenticationRequestCredentials(true);
         return provider;
@@ -31,22 +38,21 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    @Order(2)
+//    @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        // Allow access to H2 console without authentication and configure frame options and CSRF
         http
                 .authenticationProvider(adAuthenticationProvider())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/h2-console/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasAuthority("GRP_SIPE_USERS")
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
                 )
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin())
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
-                .formLogin(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 }
