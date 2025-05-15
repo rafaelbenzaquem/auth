@@ -1,5 +1,6 @@
 package br.jus.trf1.sjrr.secad.nucad.seinf.auth.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
 import java.time.Duration;
@@ -19,7 +21,13 @@ import java.util.UUID;
 
 @Profile(value = "dev")
 @Configuration
+@RequiredArgsConstructor
 public class ClienteConfig {
+
+    private final TokenSettings tokenSettings;
+    private final ClientSettings clientSettings;
+
+
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations, PasswordEncoder passwordEncoder) {
@@ -31,15 +39,11 @@ public class ClienteConfig {
             RegisteredClient angularClient = RegisteredClient.withId(UUID.randomUUID().toString())
                     .clientId("angular-client")
                     .clientSecret(passwordEncoder.encode("secret"))
+//                    .redirectUri("http://localhost:4200/login/oauth2/code/angular-client")
                     .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                    .tokenSettings(TokenSettings.builder()
-                            .accessTokenTimeToLive(Duration.ofMinutes(1))
-                            .refreshTokenTimeToLive(Duration.ofMinutes(2))
-                            .build())
-
-                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                    .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                    .redirectUri("http://localhost:4200/login/oauth2/code/angular-client")
+                    .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                    .tokenSettings(tokenSettings)
+                    .clientSettings(clientSettings)
                     .scope(OidcScopes.OPENID)
                     .scope("read")
                     .build();

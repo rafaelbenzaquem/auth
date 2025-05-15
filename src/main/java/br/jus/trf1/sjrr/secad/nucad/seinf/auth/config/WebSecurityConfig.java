@@ -52,7 +52,8 @@ public class WebSecurityConfig {
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                .oauth2ResourceServer(oRS -> oRS.jwt(Customizer.withDefaults()));
         return http.build();
     }
 }
