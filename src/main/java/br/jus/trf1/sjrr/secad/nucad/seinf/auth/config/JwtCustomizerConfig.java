@@ -19,10 +19,11 @@ public class JwtCustomizerConfig {
         return context -> {
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
                 var auth = context.getPrincipal();
-                List<String> roles = auth.getAuthorities().stream()
+                List<String> authorities = auth.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
+                        .filter(authority -> authority.contains("GRP_SIPE"))
                         .toList();
-                context.getClaims().claim("roles", roles);
+                context.getClaims().claim("authorities", authorities);
             }
             log.info("JwtCustomizerConfig context: {}", context);
         };

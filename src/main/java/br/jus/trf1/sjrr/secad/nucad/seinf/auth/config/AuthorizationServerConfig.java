@@ -29,21 +29,26 @@ import java.util.UUID;
 @Configuration
 public class AuthorizationServerConfig {
 
-    //    @Bean
-//    @Order(1)
+
+
+    @Bean
+    @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 OAuth2AuthorizationServerConfigurer.authorizationServer();
         http
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-                .with(authorizationServerConfigurer, Customizer.withDefaults())
+                .with(authorizationServerConfigurer, authorizationServer ->
+                        authorizationServer.oidc(Customizer.withDefaults()))
                 .authorizeHttpRequests(authorize ->
                         authorize.anyRequest().authenticated()
                 );
-        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults());
-        http.oauth2ResourceServer(oRS -> oRS.jwt(Customizer.withDefaults()));
-        http.formLogin(Customizer.withDefaults());
+        http
+                .oauth2ResourceServer(oAuth2ResourceServerConfigurer ->
+                        oAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults())
+                );
+        http
+                .formLogin(Customizer.withDefaults());
 
         return http.build();
     }
@@ -64,10 +69,23 @@ public class AuthorizationServerConfig {
     }
 
 
-    //    @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings(){
         return AuthorizationServerSettings.builder()
-                .issuer("http://localhost:9000")
+                // obter token
+                .tokenEndpoint("/oauth2/token")
+                // para consultar status do token
+                .tokenIntrospectionEndpoint("/oauth2/introspect")
+                // revogar
+                .tokenRevocationEndpoint("/oauth2/revoke")
+                // authorization endpoint
+                .authorizationEndpoint("/oauth2/authorize")
+                // informacoes do usuario OPEN ID CONNECT
+                .oidcUserInfoEndpoint("/oauth2/userinfo")
+                // obter a chave publica pra verificar a asstinatura do token
+                .jwkSetEndpoint("/oauth2/jwks")
+                // logout
+                .oidcLogoutEndpoint("/oauth2/logout")
                 .build();
     }
 

@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
-import java.time.Duration;
 import java.util.UUID;
 
 
@@ -27,27 +26,25 @@ public class ClienteConfig {
     private final TokenSettings tokenSettings;
     private final ClientSettings clientSettings;
 
-
-
     @Bean
     public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations, PasswordEncoder passwordEncoder) {
         var repository = new JdbcRegisteredClientRepository(jdbcOperations);
-
-        RegisteredClient registeredClient = repository.findByClientId("angular-client");
-
-        if (registeredClient == null) {
-            RegisteredClient angularClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                    .clientId("angular-client")
-                    .clientSecret(passwordEncoder.encode("secret"))
-//                    .redirectUri("http://localhost:4200/login/oauth2/code/angular-client")
+        String secret = passwordEncoder.encode("secret");
+        // Cria/atualiza client de teste para Authorization Code Flow (Postman/Insomnia)
+        RegisteredClient postmanClient = repository.findByClientId("postman-client");
+        if (postmanClient == null) {
+            postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("postman-client")
+                    .clientSecret(secret)
                     .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                    .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                    .redirectUri("https://oauth.pstmn.io/v1/callback")
+                    .scope(OidcScopes.OPENID)
                     .tokenSettings(tokenSettings)
                     .clientSettings(clientSettings)
-                    .scope(OidcScopes.OPENID)
-                    .scope("read")
                     .build();
-            repository.save(angularClient);
+            repository.save(postmanClient);
         }
         return repository;
     }
