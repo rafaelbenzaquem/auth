@@ -173,4 +173,4 @@ Resposta:
 Pull requests são bem-vindos! Abra issues para sugestões e melhorias.
 
 ---
-_Desenvolvido por equipe SEINF/SJRR_
+_Desenvolvido pela equipe SEINF/SJRR

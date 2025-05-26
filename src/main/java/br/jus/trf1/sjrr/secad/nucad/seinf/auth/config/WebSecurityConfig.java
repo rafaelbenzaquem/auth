@@ -43,11 +43,9 @@ public class WebSecurityConfig {
         http
                 .authenticationProvider(adAuthenticationProvider())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().hasAuthority("GRP_SIPE_USERS")
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/auth/**"))
                 )
                 .formLogin(Customizer.withDefaults())
