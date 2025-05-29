@@ -27,25 +27,41 @@ public class ClienteConfig {
     private final ClientSettings clientSettings;
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations, PasswordEncoder passwordEncoder) {
+    public RegisteredClientRepository registeredClientRepository(
+            JdbcOperations jdbcOperations,
+            TokenSettings tokenSettings,
+            PasswordEncoder passwordEncoder) {
+
         var repository = new JdbcRegisteredClientRepository(jdbcOperations);
-        String secret = passwordEncoder.encode("secret");
-        // Cria/atualiza client de teste para Authorization Code Flow (Postman/Insomnia)
-        RegisteredClient postmanClient = repository.findByClientId("postman-client");
-        if (postmanClient == null) {
-            postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                    .clientId("postman-client")
-                    .clientSecret(secret)
-                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+
+        // tenta carregar; se não existir, cria como cliente público PKCE-only
+        RegisteredClient sipeWeb = repository.findByClientId("sipe-web");
+        if (sipeWeb == null) {
+            sipeWeb = RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("sipe-web")
+                    // sem clientSecret: public client
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                    // somente Authorization Code + PKCE
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    // opcional: se quiser refresh tokens
                     .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                    .redirectUri("https://oauth.pstmn.io/v1/callback")
+                    .redirectUri("http://localhost:4200/index")
+                    // URI que o IdP poderá usar após o logout federado
+                    .postLogoutRedirectUri("http://localhost:4200")
                     .scope(OidcScopes.OPENID)
+
+                    // se usar refresh token no SPA, adicione também OidcScopes.OFFLINE_ACCESS
+                    //.scope(OidcScopes.OFFLINE_ACCESS)
                     .tokenSettings(tokenSettings)
-                    .clientSettings(clientSettings)
+                    // força PKCE e (opcional) consent screen
+                    .clientSettings(ClientSettings.builder()
+                            .requireProofKey(true)
+                            .requireAuthorizationConsent(false)
+                            .build())
                     .build();
-            repository.save(postmanClient);
+            repository.save(sipeWeb);
         }
         return repository;
     }
+
 }

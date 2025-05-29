@@ -48,8 +48,7 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/auth/**"))
                 )
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults());
+                .formLogin(Customizer.withDefaults());
         return http.build();
     }
 }
