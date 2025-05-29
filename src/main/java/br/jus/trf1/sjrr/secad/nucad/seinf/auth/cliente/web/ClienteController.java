@@ -27,6 +27,7 @@ public class ClienteController {
     @PostMapping
     @PreAuthorize("hasAuthority('GRP_SIPE_ADMIN')")
     public ResponseEntity<ClienteCredencialResponse> register(@RequestBody ClienteRequest dto) {
+        log.info("register: {}", dto);
         var cliente = clienteService.registrar(dto);
         return ResponseEntity.ok(
                 new ClienteCredencialResponse(cliente.getClientId(), cliente.getClientSecret())

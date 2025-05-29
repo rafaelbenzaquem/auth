@@ -4,19 +4,11 @@ server:
 spring:
   application:
     name: auth
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:org/springframework/security/oauth2/server/authorization/client/oauth2-registered-client-schema.sql
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: sa123456
-    driver-class-name: org.h2.Driver
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/authdb?allowPublicKeyRetrieval=true&sslMode=DISABLED}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_USER_PASSWORD:123456789}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 domain:
   control:
