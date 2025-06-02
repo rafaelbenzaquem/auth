@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -43,12 +42,13 @@ public class WebSecurityConfig {
         http
                 .authenticationProvider(adAuthenticationProvider())
                 .authorizeHttpRequests(authz -> authz
-                        .anyRequest().hasAuthority("GRP_SIPE_USERS")
+                        .requestMatchers("/login/**").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/auth/**"))
                 )
-                .formLogin(Customizer.withDefaults());
+                .formLogin( configurer -> configurer.loginPage("/login").permitAll());
         return http.build();
     }
 }

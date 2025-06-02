@@ -1,19 +1,32 @@
 server:
-  port: 9000
+  port: ${SERVER_PORT}
 
 spring:
   application:
     name: auth
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/authdb?allowPublicKeyRetrieval=true&sslMode=DISABLED}
-    username: ${MYSQL_USER:root}
-    password: ${MYSQL_USER_PASSWORD:123456789}
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_USER_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 domain:
   control:
     name: ${DOMAIN_CONTROL_NAME}
     url: ${DOMAIN_CONTROL_URL}
+sipe:
+  api:
+    url: ${SIPE_API_URL}
+  web:
+    url: ${SIPE_WEB_URL}
+
+jsarh:
+  api:
+    url: ${JSARH_URL}
+
+coletor:
+  api:
+    url: ${COLETOR_URL}
 
 logging:
   level:

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Material Design Tokens: Surface & On-Surface Colors & Spacing -->
+    <style>
+      :root {
+        /* Surface and On-Surface colors */
+        --md-sys-color-surface: #FAFAFA;
+        --md-sys-color-on-surface: #1A1C1E;
+        /* Primary color for buttons */
+        --md-sys-color-primary: #102027;
+        --md-sys-color-on-primary: #FFFFFF;
+        /* Vertical spacing for login components */
+        --login-vspace: 2.0rem;
+      }
+      body {
+        background-color: var(--md-sys-color-surface) !important;
+        color: var(--md-sys-color-on-surface);
+      }
+      .card {
+        background-color: var(--md-sys-color-surface) !important;
+        color: var(--md-sys-color-on-surface);
+        /* Remove card shadow and border radius to blend with background */
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      .btn {
+        background-color: var(--md-sys-color-primary) !important;
+        color: var(--md-sys-color-on-primary) !important;
+      }
+      a {
+        color: var(--md-sys-color-primary);
+      }
+      /* Login vertical spacing */
+      .login-logo-img { margin-bottom: var(--login-vspace) !important; }
+      .login-title { margin-bottom: var(--login-vspace) !important; display: block; }
+      .login-form .input-field { margin-bottom: calc(var(--login-vspace) / 1.5) !important; }
+      .login-btn { margin-top: var(--login-vspace) !important; }
+    </style>
+  </head>
+  <body class="valign-wrapper" style="height:100vh;">
+
+    <div class="container">
+      <div class="row">
+        <div class="col s12 m6 offset-m3">
+          <div class="card">
+            <div class="card-content">
+              <!-- Logo da empresa acima do título -->
+              <div class="center-align">
+                <img src="http://localhost:8084/v1/sipe/arquivos/nome/logoImagem3.png" alt="SJRR" class="responsive-img login-logo-img" />
+
+              </div>
+              <span class="card-title center-align login-title">Entrar</span>
+              <!-- Exibe mensagem de erro quando falha no login -->
+              <div th:if="${param.error}" class="card-panel red lighten-2 white-text" role="alert">
+                Falha no login. Usuário ou senha inválidos.
+              </div>
+              <form class="login-form" method="POST" th:action="@{/login}">
+                <div class="input-field">
+                  <i class="material-icons prefix">person</i>
+                  <input id="username" name="username" type="text" class="validate" required autofocus>
+                  <label for="username">Matrícula</label>
+                </div>
+                <div class="input-field">
+                  <i class="material-icons prefix">lock</i>
+                  <input id="password" name="password" type="password" class="validate" required>
+                  <label for="password">Senha</label>
+                </div>
+                <div class="center-align">
+                  <button type="submit" class="btn waves-effect waves-light login-btn">Entrar</button>
+                </div>
+                <div class="center-align" style="margin-top:1rem;">
+                  <a href="https://esosti.trf1.jus.br/itsm/webclient/login/login.jsp?appservauth=true">Esqueceu a senha?</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

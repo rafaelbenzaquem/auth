@@ -1,6 +1,7 @@
 package br.jus.trf1.sjrr.secad.nucad.seinf.auth.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -23,6 +24,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ClienteConfig {
 
+    @Value("${sipe.web.url}")
+    private String sipeWebUrl;
+
     private final TokenSettings tokenSettings;
     private final ClientSettings clientSettings;
 
@@ -34,26 +38,17 @@ public class ClienteConfig {
 
         var repository = new JdbcRegisteredClientRepository(jdbcOperations);
 
-        // tenta carregar; se não existir, cria como cliente público PKCE-only
         RegisteredClient sipeWeb = repository.findByClientId("sipe-web");
         if (sipeWeb == null) {
             sipeWeb = RegisteredClient.withId(UUID.randomUUID().toString())
                     .clientId("sipe-web")
-                    // sem clientSecret: public client
                     .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-                    // somente Authorization Code + PKCE
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                    // opcional: se quiser refresh tokens
                     .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                    .redirectUri("http://localhost:4200/index")
-                    // URI que o IdP poderá usar após o logout federado
-                    .postLogoutRedirectUri("http://localhost:4200")
+                    .redirectUri(sipeWebUrl)
+                    .postLogoutRedirectUri(sipeWebUrl)
                     .scope(OidcScopes.OPENID)
-
-                    // se usar refresh token no SPA, adicione também OidcScopes.OFFLINE_ACCESS
-                    //.scope(OidcScopes.OFFLINE_ACCESS)
                     .tokenSettings(tokenSettings)
-                    // força PKCE e (opcional) consent screen
                     .clientSettings(ClientSettings.builder()
                             .requireProofKey(true)
                             .requireAuthorizationConsent(false)

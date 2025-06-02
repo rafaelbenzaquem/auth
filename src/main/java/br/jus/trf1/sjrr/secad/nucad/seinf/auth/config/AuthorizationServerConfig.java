@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -35,6 +36,18 @@ import java.util.UUID;
 public class AuthorizationServerConfig {
 
 
+    @Value("${sipe.web.url}")
+    private String sipeWebUrl;
+
+    @Value("${sipe.api.url}")
+    private String sipeApiUrl;
+
+    @Value("${jsarh.api.url}")
+    private String jsarhApiUrl;
+
+    @Value("${coletor.api.url}")
+    private String coletorApiUrl;
+
 
     @Bean
     @Order(1)
@@ -54,7 +67,7 @@ public class AuthorizationServerConfig {
                         oAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults())
                 );
         http
-                .formLogin(Customizer.withDefaults());
+                .formLogin( configurer -> configurer.loginPage("/login").permitAll());
 
         return http.build();
     }
@@ -62,8 +75,8 @@ public class AuthorizationServerConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200")); // origem do seu frontend
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of(sipeWebUrl, sipeApiUrl, jsarhApiUrl, coletorApiUrl)); // origem do seu frontend
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
@@ -76,7 +89,7 @@ public class AuthorizationServerConfig {
     public TokenSettings tokenSettings() {
         return TokenSettings.builder()
                 .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                .accessTokenTimeToLive(Duration.ofMinutes(3))
+                .accessTokenTimeToLive(Duration.ofMinutes(10))
                 .build();
     }
 
@@ -89,7 +102,7 @@ public class AuthorizationServerConfig {
 
 
     @Bean
-    public AuthorizationServerSettings authorizationServerSettings(){
+    public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
                 // obter token
                 .tokenEndpoint("/oauth2/token")

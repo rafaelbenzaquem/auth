@@ -1,5 +1,5 @@
 server:
-  port: 9000
+  port: ${SERVER_PORT:9000}
 
 spring:
   application:
@@ -18,6 +18,20 @@ domain:
   control:
     name: ${DOMAIN_CONTROL_NAME:benzaquem.com.br}
     url: ${DOMAIN_CONTROL_URL:ldap://192.168.153.132:389/}
+
+sipe:
+  api:
+    url: ${SIPE_API_URL:http://localhost:8087}
+  web:
+    url: ${SIPE_WEB_URL:http://localhost:4200}
+
+jsarh:
+  api:
+    url: ${JSARH_URL:http://localhost:8087}
+
+coletor:
+  api:
+    url: ${COLETOR_URL:http://localhost:8082}
 
 logging:
   level:
