@@ -21,7 +21,7 @@ domain:
 
 sipe:
   api:
-    url: ${SIPE_API_URL:http://localhost:8087}
+    url: ${SIPE_API_URL:http://localhost:8084}
   web:
     url: ${SIPE_WEB_URL:http://localhost:4200}
 

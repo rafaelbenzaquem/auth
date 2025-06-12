@@ -32,9 +32,7 @@ public class ClienteConfig {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(
-            JdbcOperations jdbcOperations,
-            TokenSettings tokenSettings,
-            PasswordEncoder passwordEncoder) {
+            JdbcOperations jdbcOperations) {
 
         var repository = new JdbcRegisteredClientRepository(jdbcOperations);
 
@@ -49,10 +47,7 @@ public class ClienteConfig {
                     .postLogoutRedirectUri(sipeWebUrl)
                     .scope(OidcScopes.OPENID)
                     .tokenSettings(tokenSettings)
-                    .clientSettings(ClientSettings.builder()
-                            .requireProofKey(true)
-                            .requireAuthorizationConsent(false)
-                            .build())
+                    .clientSettings(clientSettings)
                     .build();
             repository.save(sipeWeb);
         }

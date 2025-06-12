@@ -43,7 +43,7 @@ public class WebSecurityConfig {
                 .authenticationProvider(adAuthenticationProvider())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/login/**").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/auth/**"))

@@ -89,13 +89,16 @@ public class AuthorizationServerConfig {
     public TokenSettings tokenSettings() {
         return TokenSettings.builder()
                 .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                .accessTokenTimeToLive(Duration.ofMinutes(10))
+                .refreshTokenTimeToLive(Duration.ofHours(24))
+                .reuseRefreshTokens(true)
+                .accessTokenTimeToLive(Duration.ofHours(8))
                 .build();
     }
 
     @Bean
     public ClientSettings clientSettings() {
         return ClientSettings.builder()
+                .requireProofKey(true)
                 .requireAuthorizationConsent(false)
                 .build();
     }
