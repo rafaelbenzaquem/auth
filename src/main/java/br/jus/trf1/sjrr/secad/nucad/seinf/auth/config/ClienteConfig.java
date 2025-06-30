@@ -1,7 +1,6 @@
 package br.jus.trf1.sjrr.secad.nucad.seinf.auth.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -24,34 +23,29 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ClienteConfig {
 
-    @Value("${sipe.web.url}")
-    private String sipeWebUrl;
-
     private final TokenSettings tokenSettings;
     private final ClientSettings clientSettings;
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(
-            JdbcOperations jdbcOperations) {
-
+    public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations, PasswordEncoder passwordEncoder) {
         var repository = new JdbcRegisteredClientRepository(jdbcOperations);
-
-        RegisteredClient sipeWeb = repository.findByClientId("sipe-web");
-        if (sipeWeb == null) {
-            sipeWeb = RegisteredClient.withId(UUID.randomUUID().toString())
-                    .clientId("sipe-web")
-                    .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+        String secret = passwordEncoder.encode("secret");
+        // Cria/atualiza client de teste para Authorization Code Flow (Postman/Insomnia)
+        RegisteredClient postmanClient = repository.findByClientId("postman-client");
+        if (postmanClient == null) {
+            postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("postman-client")
+                    .clientSecret(secret)
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                     .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                    .redirectUri(sipeWebUrl)
-                    .postLogoutRedirectUri(sipeWebUrl)
+                    .redirectUri("https://oauth.pstmn.io/v1/callback")
                     .scope(OidcScopes.OPENID)
                     .tokenSettings(tokenSettings)
                     .clientSettings(clientSettings)
                     .build();
-            repository.save(sipeWeb);
+            repository.save(postmanClient);
         }
         return repository;
     }
-
 }
