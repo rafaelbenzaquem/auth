@@ -71,8 +71,9 @@
                 <div class="card-content">
                     <!-- Logo da empresa acima do título -->
                     <div class="center-align">
-                        <img src="http://localhost:8084/v1/sipe/arquivos/nome/logoImagem3.png" alt="SJRR"
-                             class="responsive-img login-logo-img"/>
+                        <div th:with="logoUrl=${@environment.getProperty('sipe.api.url') + '/v1/sipe/arquivos/nome/logoImagem3.png'}">
+                            <img th:src="${logoUrl}" alt="SJRR" class="responsive-img login-logo-img"/>
+                        </div>
 
                     </div>
                     <span class="card-title center-align login-title">Entrar</span>
