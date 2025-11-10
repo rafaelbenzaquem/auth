@@ -78,9 +78,8 @@
                     </div>
                     <span class="card-title center-align login-title">Entrar</span>
                     <!-- Exibe mensagem de erro quando falha no login -->
-                    <div th:if="${param.error}" class="card-panel red lighten-2 white-text" role="alert">
-                        ${param.m}
-                    </div>
+                    <div th:if="${param.error}" class="card-panel red lighten-2 white-text" role="alert"
+                         th:text="${session.SPRING_SECURITY_LAST_EXCEPTION.message}"/>
                     <form class="login-form" method="POST" th:action="@{/login}">
                         <div class="input-field">
                             <i class="material-icons prefix">person</i>
