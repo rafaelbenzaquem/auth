@@ -10,7 +10,7 @@
     </parent>
     <groupId>br.jus.trf1.sjrr.secad.nucad.seinf</groupId>
     <artifactId>auth</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.9.0</version>
     <name>auth</name>
     <description>servidor de autorização e autenticação</description>
     <url/>
